@@ -15,8 +15,7 @@ app.use(helmet.hidePoweredBy({ setTo: 'PHP 4.2.0'}));
 app.use('/public', express.static(process.cwd() + '/public'));
 app.get('/', (req,res) => res.sendFile(process.cwd() + '/views/index.html'));
 
-const mongoURI = 'mongodb+srv://dseng905:ubho0d3I6lxe2SAa@cluster0-jnimq.mongodb.net/test?retryWrites=true&w=majority';
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.route('/api/books')
   .get(method.getAllBooks) //Retrieve all books
