@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>Personal Library API</h1>
+  <h2>API Tests</h2>
+  <h3>Test POST Request to Add a Book</h3>
+  <div>
+    <form id="add-book" action="/api/books" method="POST">
+      <label for="title">Book Title</label>
+      <input type="text" id="title" name="title">
+      <input type="submit" value="Submit" onclick="redirectToHome()">
+    </form>
+  </div>
+  <h3>Test POST Request to Add Comment to a Book By ID</h3>
+  <div>
+    <form id="getBookById" method="POST" onsubmit="ModifyAction()">
+      <label for="id">Book ID</label>
+      <input type="text" id="id" name="id">
+      <label for="comment">Comment</label>
+      <input type="text" id="comment" name="comment">
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+  <div id="library">
+    <h3>Front End Example</h3>
+    <button onclick="deleteAllBooks()">Delete ALL Books</button> 
+
+    <div id="library-list"></div>
+  </div>
+  <script type="text/javascript">
+  
+    let library = [];
+    fetch('/api/books')
+      .then(res => res.json())
+      .then(data => {
+        let list = "";
+        //library = data;
+        //console.log(data);
+        data.forEach(book => {
+          console.log(book);
+          list += '<p><strong>'+ book.title + '</strong><i>(_id: ' + book._id + ')</i> <button onclick="deleteBook(\'' + book._id + '\')">Delete Book</button><br>Comments: '
+                + book.commentcount + '<button onclick="showComments(\'' + book._id +'\')">Show Comments</button></p>'
+                + '<div id="' + book._id  +'-comments"></div>'; 
+        })
+        document.getElementById('library-list').innerHTML = list;
+      });
+
+    function redirectToHome() {
+      location.replace('/');
+    }
+
+   
+    
+    function deleteBook(id) {
+      fetch('/api/books/' + id, {method: "DELETE"});
+      location.replace('/');
+    }
+
+    function deleteAllBooks() {
+      fetch('/api/books', {method : "DELETE"});
+      location.replace('/');
+    }
+
+    function showComments(id) {
+      let comments = "<ul>";
+      fetch('/api/books/' + id)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            if(document.getElementById(id + '-comments').innerHTML != "") {
+              document.getElementById(id + '-comments').innerHTML = "";
+            }
+            else {
+              data.comments.forEach(comment => {
+                comments += '<li>' + comment + '</li>';
+              })
+              comments += '</ul>';
+              document.getElementById(id + '-comments').innerHTML = comments;
+            }
+        })
+    }
+
+    function ModifyAction() {
+      document.getElementById('getBookById')
+        .setAttribute('action',
+          "/api/books/" + document.getElementById("id").value);
+    }
+  </script>
+</body>
+</html>
